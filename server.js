@@ -18,17 +18,24 @@ io.on('connection', (socket) => {
     count++;
     io.emit('userCount', count);
 
+    // Handle new user joining with a username
+    socket.on('join', (username) => {
+        socket.username = username;
+        io.emit('message', { user: 'System', text: `${username} has joined the chat.` });
+    });
+
     socket.on('message', (message) => {
-        io.emit('message', message);
+        io.emit('message', { user: socket.username, text: message });
     });
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
         // Decrease count and emit to all clients
+        io.emit('message', { user: 'System', text: `${socket.username} has left the chat.` });
         count--;
         io.emit('userCount', count);
     });
 });
 
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log('Server running on port :${PORT}'));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
