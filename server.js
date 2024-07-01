@@ -1,3 +1,5 @@
+// mongodb+srv://rashtriyahello:Df3qDh3oXwtg6cqr@cluster0.xjz2hmo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -43,7 +45,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('message', (data) => {
-    const message = `${data.username}: ${data.message}`;
+    const message = { username: data.username, message: data.message };
     io.emit('message', message);
   });
 
