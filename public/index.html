@@ -28,34 +28,42 @@
 </head>
 
 <body>
-  <h1>Welcome to WORLD CHAT</h1>
-  <div id="messages" style="color: green;"></div>
-  <input id="messageInput" type="text" placeholder="Type a message..." />
-  <button id="sendButton">Send</button>
+  <h1>Welcome to my WIDE CHAT</h1>
+  <div id="chat">
+      <div id="messages"></div>
+      <input id="messageInput" type="text" placeholder="Type a message..." />
+      <button id="sendButton">Send</button>
+  </div>
+  <div id="userCount"></div>
+  
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const socket = io();
+   document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
 
-      const messagesDiv = document.getElementById('messages');
-      const messageInput = document.getElementById('messageInput');
-      const sendButton = document.getElementById('sendButton');
+    const userCountDiv = document.getElementById('userCount');
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
 
-      sendButton.addEventListener('click', () => {
-        const message = messageInput.value;
-        if (message) {
-          socket.emit('message', message);
-          messageInput.value = '';
+    socket.on('userCount', (count) => {
+        userCountDiv.textContent = `Current users online: ${count}`;
+    });
+
+    sendButton.addEventListener('click', () => {
+        const message = messageInput.value.trim();
+        if (message !== '') {
+            socket.emit('message', message);
+            messageInput.value = '';
         }
-      });
+    });
 
-      socket.on('message', (message) => {
+    socket.on('message', (message) => {
         const messageElement = document.createElement('div');
         messageElement.textContent = message;
         messagesDiv.appendChild(messageElement);
-      });
     });
-
+});
   </script>
 </body>
 
