@@ -3,32 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Socket.IO Chat App</title>
+  <title>Socket.IO App</title>
+  <meta name="google-adsense-account" content="ca-pub-2179785225331533">
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 50px 30px;
-      background-color: #000;
+      background-color: rgb(0, 0, 0);
       color: white;
     }
-
     #messages {
       margin: 20px 0;
       line-height: 20px;
-      max-height: 400px; /* Set max height for the messages container */
-      overflow-y: auto; /* Enable vertical scrolling */
-      word-wrap: break-word; /* Break long words */
+      max-height: 400px;
+      overflow-y: auto;
+      word-wrap: break-word;
     }
-
     #messageInput {
       width: 50%;
       padding: 10px;
     }
-
     #sendButton {
       padding: 10px 20px;
     }
-
     .static {
       left: 0;
       position: fixed;
@@ -38,18 +35,15 @@
       margin: 0 auto;
       padding-bottom: 10px;
     }
-
     #chat {
       width: 70%;
       margin: 0 auto;
       min-height: 0vh;
     }
-
     .page {
       text-align: center;
       width: 100%;
     }
-
     #userCount {
       font-size: 20px;
       position: fixed;
@@ -57,29 +51,23 @@
       top: 10px;
       left: 10px;
     }
-
     .message {
       background-color: rgb(0, 44, 31);
       padding: 3px 5px;
       margin: 5px auto;
       border-radius: 5px;
-      word-wrap: break-word; /* Ensure messages don't overflow */
-      max-width: 90%; /* Ensure messages don't take up the full width */
-      overflow: hidden; /* Ensure text scrolls and doesn't overflow */
-      display: block; /* Ensure each message is on a new line */
+      word-wrap: break-word;
+      max-width: 90%;
+      overflow: hidden;
+      display: block;
     }
-
-    .username {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
     @media screen and (max-width: 800px) {
       #chat {
         width: 100%;
       }
     }
   </style>
+  <script data-ad-client="ca-pub-2179785225331533" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
   <div id="userCount"></div>
@@ -88,18 +76,26 @@
     <h2>Here you can chat with the hundreds of users at once.</h2>
     <div id="chat">
       <div id="messages"></div>
+      <!-- Ad unit -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-2179785225331533"
+           data-ad-slot="6876316100"
+           data-ad-format="auto"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
     <div class="static">
       <input id="messageInput" type="text" placeholder="Type a message..." />
       <button id="sendButton">Send</button>
     </div>
   </div>
-
+  
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const socket = io();
-      let username = prompt("Enter your username:");
 
       const userCountDiv = document.getElementById('userCount');
       const messagesDiv = document.getElementById('messages');
@@ -113,27 +109,17 @@
       sendButton.addEventListener('click', () => {
         const message = messageInput.value.trim();
         if (message !== '') {
-          socket.emit('message', { username, message });
+          socket.emit('message', message);
           messageInput.value = '';
         }
       });
 
-      socket.on('message', (data) => {
+      socket.on('message', (message) => {
         const messageElement = document.createElement('div');
+        messageElement.textContent = message;
         messageElement.className = 'message';
-
-        const usernameElement = document.createElement('span');
-        usernameElement.className = 'username';
-        usernameElement.textContent = data.username + ": ";
-
-        const textElement = document.createElement('span');
-        textElement.textContent = data.message;
-
-        messageElement.appendChild(usernameElement);
-        messageElement.appendChild(textElement);
-
         messagesDiv.appendChild(messageElement);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom on new message
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
     });
   </script>
