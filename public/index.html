@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+
+    #messages {
+      margin: 20px 0;
+    }
+
+    #messageInput {
+      width: 80%;
+      padding: 10px;
+    }
+
+    #sendButton {
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Welcome to my Socket.IO App</h1>
+  <div id="messages"></div>
+  <input id="messageInput" type="text" placeholder="Type a message..." />
+  <button id="sendButton">Send</button>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io();
+
+      const messagesDiv = document.getElementById('messages');
+      const messageInput = document.getElementById('messageInput');
+      const sendButton = document.getElementById('sendButton');
+
+      sendButton.addEventListener('click', () => {
+        const message = messageInput.value;
+        if (message) {
+          socket.emit('message', message);
+          messageInput.value = '';
+        }
+      });
+
+      socket.on('message', (message) => {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messagesDiv.appendChild(messageElement);
+      });
+    });
+
+  </script>
+</body>
+
+</html>
