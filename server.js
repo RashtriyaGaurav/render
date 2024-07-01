@@ -11,7 +11,7 @@ const io = socketIo(server);
 let count = 0; // Variable to track connected users
 
 // MongoDB connection
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = 'mongodb+srv://rashtriyahello:Df3qDh3oXwtg6cqr@cluster0.xjz2hmo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
