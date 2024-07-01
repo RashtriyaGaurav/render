@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Socket.IO App</title>
+  <title>Socket.IO Chat App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 50px 30px;
-      background-color: rgb(0, 0, 0);
+      background-color: #000;
       color: white;
     }
 
     #messages {
       margin: 20px 0;
       line-height: 20px;
-      max-height: 400px;
-      overflow-y: auto;
-      word-wrap: break-word;
+      max-height: 400px; /* Set max height for the messages container */
+      overflow-y: auto; /* Enable vertical scrolling */
+      word-wrap: break-word; /* Break long words */
     }
 
     #messageInput {
@@ -63,10 +63,15 @@
       padding: 3px 5px;
       margin: 5px auto;
       border-radius: 5px;
-      word-wrap: break-word;
-      max-width: 90%;
-      overflow: hidden;
-      display: block;
+      word-wrap: break-word; /* Ensure messages don't overflow */
+      max-width: 90%; /* Ensure messages don't take up the full width */
+      overflow: hidden; /* Ensure text scrolls and doesn't overflow */
+      display: block; /* Ensure each message is on a new line */
+    }
+
+    .username {
+      font-weight: bold;
+      margin-right: 5px;
     }
 
     @media screen and (max-width: 800px) {
@@ -89,14 +94,12 @@
       <button id="sendButton">Send</button>
     </div>
   </div>
-  
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const socket = io();
-
-      let username = prompt('Enter your username:');
-      socket.emit('setUsername', username);
+      let username = prompt("Enter your username:");
 
       const userCountDiv = document.getElementById('userCount');
       const messagesDiv = document.getElementById('messages');
@@ -117,10 +120,20 @@
 
       socket.on('message', (data) => {
         const messageElement = document.createElement('div');
-        messageElement.textContent = `${data.username}: ${data.message}`;
         messageElement.className = 'message';
+
+        const usernameElement = document.createElement('span');
+        usernameElement.className = 'username';
+        usernameElement.textContent = data.username + ": ";
+
+        const textElement = document.createElement('span');
+        textElement.textContent = data.message;
+
+        messageElement.appendChild(usernameElement);
+        messageElement.appendChild(textElement);
+
         messagesDiv.appendChild(messageElement);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom on new message
       });
     });
   </script>

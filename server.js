@@ -12,23 +12,23 @@ let count = 0; // Variable to track connected users
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+    console.log('New client connected');
 
-  // Increase count and emit to all clients
-  count++;
-  io.emit('userCount', count);
-
-  socket.on('message', (data) => {
-    io.emit('message', data.message);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-    // Decrease count and emit to all clients
-    count--;
+    // Increase count and emit to all clients
+    count++;
     io.emit('userCount', count);
-  });
+
+    socket.on('message', (message) => {
+        io.emit('message', message);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+        // Decrease count and emit to all clients
+        count--;
+        io.emit('userCount', count);
+    });
 });
 
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log('Server running on port :${PORT}'));
