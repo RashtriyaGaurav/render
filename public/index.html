@@ -100,6 +100,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const socket = io();
       let username = prompt("Enter your username:");
+      socket.emit('setUsername', username);
 
       const userCountDiv = document.getElementById('userCount');
       const messagesDiv = document.getElementById('messages');
