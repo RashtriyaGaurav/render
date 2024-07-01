@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +7,17 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      
-      padding: 50px;
+      padding: 50px 30px;
+      background-color: rgb(0, 0, 0);
+      color: white;
     }
 
     #messages {
       margin: 20px 0;
       line-height: 20px;
+      max-height: 400px; /* Set max height for the messages container */
+      overflow-y: auto; /* Enable vertical scrolling */
+      word-wrap: break-word; /* Break long words */
     }
 
     #messageInput {
@@ -26,87 +29,102 @@
       padding: 10px 20px;
     }
 
-    .static{
+    .static {
       left: 0;
       position: fixed;
       bottom: 10px;
       height: auto;
       width: 100%;
       margin: 0 auto;
-   background-color: #fff;
-    
+      padding-bottom: 10px;
+    }
+
+    #chat {
+      width: 70%;
+      margin: 0 auto;
+      min-height: 0vh;
+      
       
     }
 
-    #chat{
-      width: 70%;
-    
-      margin: 0 auto;
-      min-height: 30vh;
-      border: 1px solid rgb(94, 94, 94);
-      border-radius: 5px;
-
+    .page {
+      text-align: center;
+      width: 100%;
     }
-.page{
-  text-align: center;
-  
-}
-    #userCount{
-     position: fixed;
-color: green;
-top: 10px;
-left: 10px;
 
+    #userCount {
+      font-size: 20px;
+      position: fixed;
+      color: rgb(0, 184, 0);
+      top: 10px;
+      left: 10px;
+    }
+
+    .message {
+      background-color: rgb(0, 44, 31);
+      padding: 3px 5px;
+     
+      margin: 5px auto;
+      border-radius: 5px;
+      word-wrap: break-word; /* Ensure messages don't overflow */
+      max-width: 90%; /* Ensure messages don't take up the full width */
+      overflow: hidden; /* Ensure text scrolls and doesn't overflow */
+      display: block; /* Ensure each message is on a new line */
+    }
+
+    @media screen and (max-width: 800px) {
+      #chat {
+        width: 100%;
+        background-color: red;
+      }
     }
   </style>
 </head>
-
 <body>
   <div id="userCount"></div>
   <div class="page">
-  <h1>WELCOME TO WORLD CHAT</h1>
-  <h2>Here you can chat with the hundreds of users at once.</h2>
-  <h3>Share the link of website and add your friends to increase no. of users</h3>
-  <div id="chat">
-      
-      <div id="messages">Messages :</div>
+    <h1>WELCOME TO WORLD CHAT</h1>
+    <h2>Here you can chat with the hundreds of users at once.</h2>
+    <h3>Share the link of website and add your friends to increase no. of users</h3>
+    <div id="chat">
+      <div id="messages"></div>
     </div>
-   <div class="static">
+    <div class="static">
       <input id="messageInput" type="text" placeholder="Type a message..." />
       <button id="sendButton">Send</button>
     </div>
   </div>
   
-  
   <script src="/socket.io/socket.io.js"></script>
   <script>
-   document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
+    document.addEventListener('DOMContentLoaded', () => {
+      const socket = io();
 
-    const userCountDiv = document.getElementById('userCount');
-    const messagesDiv = document.getElementById('messages');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
+      const userCountDiv = document.getElementById('userCount');
+      const messagesDiv = document.getElementById('messages');
+      const messageInput = document.getElementById('messageInput');
+      const sendButton = document.getElementById('sendButton');
 
-    socket.on('userCount', (count) => {
+      socket.on('userCount', (count) => {
         userCountDiv.textContent = `Online: ${count}`;
-    });
+      });
 
-    sendButton.addEventListener('click', () => {
+      sendButton.addEventListener('click', () => {
         const message = messageInput.value.trim();
         if (message !== '') {
-            socket.emit('message', message);
-            messageInput.value = '';
+          socket.emit('message', message);
+          messageInput.value = '';
         }
-    });
+      });
 
-    socket.on('message', (message) => {
+      socket.on('message', (message) => {
         const messageElement = document.createElement('div');
         messageElement.textContent = message;
+        messageElement.className = 'message';
         messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom on new message
+      });
     });
-});
   </script>
 </body>
-
 </html>
