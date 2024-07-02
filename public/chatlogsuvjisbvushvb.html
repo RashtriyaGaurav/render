@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Logs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 50px 30px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+    }
+
+    #chatLogs {
+      margin: 20px 0;
+      line-height: 20px;
+      max-height: 400px; /* Set max height for the messages container */
+      overflow-y: auto; /* Enable vertical scrolling */
+      word-wrap: break-word; /* Break long words */
+    }
+
+    .log {
+      background-color: rgb(0, 44, 31);
+      padding: 3px 5px;
+      margin: 5px auto;
+      border-radius: 5px;
+      word-wrap: break-word; /* Ensure messages don't overflow */
+      max-width: 90%; /* Ensure messages don't take up the full width */
+      overflow: hidden; /* Ensure text scrolls and doesn't overflow */
+      display: block; /* Ensure each message is on a new line */
+    }
+
+    .username {
+      font-weight: bold;
+      display: block;
+    }
+
+    @media screen and (max-width: 800px) {
+      #chatLogs {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Chat Logs</h1>
+    <div id="chatLogs"></div>
+    <button onclick="window.location.href='/'">Back to Chat</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/chatlogs')
+        .then(response => response.json())
+        .then(data => {
+          const chatLogsDiv = document.getElementById('chatLogs');
+          data.forEach(log => {
+            const logElement = document.createElement('div');
+            logElement.className = 'log';
+            
+            const usernameElement = document.createElement('span');
+            usernameElement.className = 'username';
+            usernameElement.textContent = `${log.user}: `;
+            
+            logElement.appendChild(usernameElement);
+            logElement.appendChild(document.createTextNode(`[${new Date(log.time).toLocaleString()}] ${log.text}`));
+            
+            chatLogsDiv.appendChild(logElement);
+          });
+        });
+    });
+  </script>
+</body>
+</html>
