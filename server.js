@@ -9,49 +9,31 @@ const io = socketIo(server);
 
 let count = 0; // Variable to track connected users
 let chatLogs = []; // Array to store chat logs
-let users = {}; // Object to store user status
 
 app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", (socket) => {
   console.log("New client connected");
 
-  // Set initial status for the user
-  socket.on("status", (status) => {
-    users[socket.id] = {
-      username: status.username,
-      online: true,
-      socket: socket,
-    };
-  });
+  // Increase count and emit to all clients
+  count++;
+  io.emit("userCount", count);
 
   // Handle new user joining with a username
   socket.on("join", (username) => {
-    users[socket.id] = {
-      username: username,
-      online: true,
-      socket: socket,
-    };
-
+    socket.username = username;
     const joinMessage = {
       user: "System",
       text: `${username} has joined the chat.`,
       time: new Date().toISOString(),
     };
     io.emit("message", joinMessage);
-
-    // Notify offline users
-    Object.keys(users).forEach((userId) => {
-      const user = users[userId];
-      if (!user.online && user.username === "<name>") {
-        user.socket.emit("notification", `${username} has joined the chat.`);
-      }
-    });
+    chatLogs.push(joinMessage);
   });
 
   socket.on("message", (message) => {
     const chatMessage = {
-      user: users[socket.id].username,
+      user: socket.username,
       text: message,
       time: new Date().toISOString(),
     };
@@ -60,16 +42,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    if (users[socket.id]) {
-      const username = users[socket.id].username;
-      delete users[socket.id];
-      const leaveMessage = {
-        user: "System",
-        text: `${username} has left the chat.`,
-        time: new Date().toISOString(),
-      };
-      io.emit("message", leaveMessage);
-    }
+    console.log("Client disconnected");
+    const leaveMessage = {
+      user: "System",
+      text: `${socket.username} has left the chat.`,
+      time: new Date().toISOString(),
+    };
+    io.emit("message", leaveMessage);
+    chatLogs.push(leaveMessage);
+
+    // Decrease count and emit to all clients
+    count--;
+    io.emit("userCount", count);
   });
 });
 

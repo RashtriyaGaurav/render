@@ -5,9 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Socket.IO App</title>
   <style>
-    /* Your existing CSS styles */
-    /* Ensure it matches your existing styles */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 50px 30px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+    }
+
+    #messages {
+      margin: 20px 0;
+      line-height: 20px;
+      max-height: 400px; /* Set max height for the messages container */
+      overflow-y: auto; /* Enable vertical scrolling */
+      word-wrap: break-word; /* Break long words */
+    }
+
+    #messageInput {
+      width: 50%;
+      padding: 10px;
+    }
+
+    #sendButton {
+      padding: 10px 20px;
+    }
+
+    .static {
+      z-index: 1000000;
+      left: 0;
+      position: fixed;
+      bottom: 10px;
+      height: auto;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 10px;
+    }
+
+    #chat {
+      width: 70%;
+      margin: 0 auto;
+      min-height: 0vh;
+    }
+
+    .page {
+      text-align: center;
+      width: 100%;
+    }
+
+    #userCount {
+      font-size: 20px;
+      position: fixed;
+      color: rgb(0, 184, 0);
+      top: 10px;
+      left: 10px;
+    }
+
+    .message {
+      background-color: rgb(0, 44, 31);
+      padding: 3px 5px;
+      margin: 5px auto;
+      border-radius: 5px;
+      word-wrap: break-word; /* Ensure messages don't overflow */
+      max-width: 90%; /* Ensure messages don't take up the full width */
+      overflow: hidden; /* Ensure text scrolls and doesn't overflow */
+      display: block; /* Ensure each message is on a new line */
+    }
+
+    .username {
+      font-weight: bold;
+      display: block;
+    }
+
+    @media screen and (max-width: 800px) {
+      #chat {
+        width: 100%;
+      }
+    }
   </style>
+  <meta name="google-adsense-account" content="ca-pub-2179785225331533">
+  <script data-ad-client="ca-pub-2179785225331533" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
   <div id="userCount"></div>
@@ -21,6 +96,17 @@
       <input id="messageInput" type="text" placeholder="Type a message..." />
       <button id="sendButton">Send</button>
     </div>
+    <!-- Google AdSense ad unit -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-2179785225331533"
+         data-ad-slot="6876316100"
+         data-ad-format="auto"></ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <!-- Button to navigate to chat logs page -->
+    <!-- <button onclick="window.location.href='/chatlogs.html'">View Chat Logs</button> -->
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -38,10 +124,18 @@
       while (!username) {
         username = prompt("Enter your username:");
       }
-      socket.emit('status', { username: username });
+      socket.emit('join', username);
 
       socket.on('userCount', (count) => {
         userCountDiv.textContent = `Online: ${count}`;
+      });
+
+      sendButton.addEventListener('click', () => {
+        const message = messageInput.value.trim();
+        if (message !== '') {
+          socket.emit('message', message);
+          messageInput.value = '';
+        }
       });
 
       socket.on('message', (message) => {
@@ -57,22 +151,6 @@
         
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom on new message
-      });
-
-      // Receive notifications
-      socket.on('notification', (notification) => {
-        const notificationElement = document.createElement('div');
-        notificationElement.textContent = notification;
-        document.body.appendChild(notificationElement); // Example: Append to body for demonstration
-        // Replace with your preferred notification method (e.g., toast notifications)
-      });
-
-      sendButton.addEventListener('click', () => {
-        const message = messageInput.value.trim();
-        if (message !== '') {
-          socket.emit('message', message);
-          messageInput.value = '';
-        }
       });
     });
   </script>
