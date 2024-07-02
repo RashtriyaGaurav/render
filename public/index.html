@@ -30,6 +30,7 @@
     }
 
     .static {
+      z-index: 1000000;
       left: 0;
       position: fixed;
       bottom: 10px;
@@ -119,7 +120,10 @@
       const sendButton = document.getElementById('sendButton');
 
       // Prompt for username and join the chat
-      const username = prompt("Enter your username:");
+      let username = '';
+      while (!username) {
+        username = prompt("Enter your username:");
+      }
       socket.emit('join', username);
 
       socket.on('userCount', (count) => {
