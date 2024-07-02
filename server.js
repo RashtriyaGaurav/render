@@ -2,13 +2,25 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
+const mongoose = require("mongoose");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+// Connect to MongoDB
+const mongoUri = 'mongodb+srv://rashtriyahello:Df3qDh3oXwtg6cqr@cluster0.xjz2hmo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Replace with your MongoDB URI
+mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const chatSchema = new mongoose.Schema({
+  user: String,
+  text: String,
+  time: String
+});
+
+const ChatLog = mongoose.model('ChatLog', chatSchema);
+
 let count = 0; // Variable to track connected users
-let chatLogs = []; // Array to store chat logs
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -20,7 +32,7 @@ io.on("connection", (socket) => {
   io.emit("userCount", count);
 
   // Handle new user joining with a username
-  socket.on("join", (username) => {
+  socket.on("join", async (username) => {
     socket.username = username;
     const joinMessage = {
       user: "System",
@@ -28,20 +40,24 @@ io.on("connection", (socket) => {
       time: new Date().toISOString(),
     };
     io.emit("message", joinMessage);
-    chatLogs.push(joinMessage);
+
+    // Save to MongoDB
+    await new ChatLog(joinMessage).save();
   });
 
-  socket.on("message", (message) => {
+  socket.on("message", async (message) => {
     const chatMessage = {
       user: socket.username,
       text: message,
       time: new Date().toISOString(),
     };
     io.emit("message", chatMessage);
-    chatLogs.push(chatMessage);
+
+    // Save to MongoDB
+    await new ChatLog(chatMessage).save();
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     console.log("Client disconnected");
     const leaveMessage = {
       user: "System",
@@ -49,7 +65,9 @@ io.on("connection", (socket) => {
       time: new Date().toISOString(),
     };
     io.emit("message", leaveMessage);
-    chatLogs.push(leaveMessage);
+
+    // Save to MongoDB
+    await new ChatLog(leaveMessage).save();
 
     // Decrease count and emit to all clients
     count--;
@@ -58,7 +76,8 @@ io.on("connection", (socket) => {
 });
 
 // Endpoint to retrieve chat logs
-app.get("/chatlogs", (req, res) => {
+app.get("/chatlogs", async (req, res) => {
+  const chatLogs = await ChatLog.find().sort({ time: 1 });
   res.json(chatLogs);
 });
 
