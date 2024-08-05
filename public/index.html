@@ -153,6 +153,20 @@
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom on new message
       });
+
+      // Keep-alive function to ping the server every 5 minutes
+      function keepAlive() {
+        fetch('/keep-alive')
+          .then(response => response.text())
+          .then(data => console.log(data))
+          .catch(error => console.error('Error:', error));
+      }
+
+      // Send the first keep-alive request immediately
+      keepAlive();
+
+      // Set interval to send keep-alive requests every 5 minutes
+      setInterval(keepAlive, 300000);
     });
   </script>
 </body>

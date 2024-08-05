@@ -62,5 +62,10 @@ app.get("/chatlogs", (req, res) => {
   res.json(chatLogs);
 });
 
+// Keep-alive endpoint
+app.get('/keep-alive', (req, res) => {
+  res.send('Server is alive');
+});
+
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
